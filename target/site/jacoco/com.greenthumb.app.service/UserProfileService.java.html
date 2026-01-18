@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserProfileService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GreenThumb</a> &gt; <a href="index.source.html" class="el_package">com.greenthumb.app.service</a> &gt; <span class="el_source">UserProfileService.java</span></div><h1>UserProfileService.java</h1><pre class="source lang-java linenums">package com.greenthumb.app.service;
+
+import com.greenthumb.app.exception.BusinessException;
+import com.greenthumb.app.model.dto.UserProfileDto;
+import com.greenthumb.app.model.entity.User;
+import com.greenthumb.app.model.entity.UserProfile;
+import com.greenthumb.app.repository.UserProfileRepository;
+import com.greenthumb.app.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+<span class="nc" id="L14">@RequiredArgsConstructor</span>
+public class UserProfileService {
+
+    private final UserProfileRepository userProfileRepository;
+    private final UserRepository userRepository;
+
+    //Pobieranie profilu użytkownika
+    @Transactional(readOnly = true)
+    public UserProfileDto getProfile(String username) {
+<span class="nc" id="L23">        User user = userRepository.findByUsername(username)</span>
+<span class="nc" id="L24">                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</span>
+
+<span class="nc" id="L26">        UserProfile profile = user.getUserProfile();</span>
+        
+        //Obliczanie statystyk
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        int gardenCount = user.getGardens() != null ? user.getGardens().size() : 0;</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        int plantCount = user.getGardens() != null ? user.getGardens().stream()</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">                .mapToInt(g -&gt; g.getPlants() != null ? g.getPlants().size() : 0)</span>
+<span class="nc" id="L32">                .sum() : 0;</span>
+        
+<span class="nc" id="L34">        return UserProfileDto.builder()</span>
+<span class="nc" id="L35">                .username(user.getUsername())</span>
+<span class="nc" id="L36">                .email(user.getEmail())</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">                .bio(profile != null ? profile.getBio() : &quot;&quot;)</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                .avatarUrl(profile != null ? profile.getAvatarUrl() : null)</span>
+<span class="nc" id="L39">                .gardenCount(gardenCount)</span>
+<span class="nc" id="L40">                .plantCount(plantCount)</span>
+<span class="nc" id="L41">                .build();</span>
+    }
+
+    //Aktualizacja profilu użytkownika po edytowaniu przez usera
+    @Transactional
+    public UserProfileDto updateProfile(String username, UserProfileDto dto) {
+<span class="nc" id="L47">        User user = userRepository.findByUsername(username)</span>
+<span class="nc" id="L48">                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</span>
+
+<span class="nc" id="L50">        UserProfile profile = user.getUserProfile();</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (profile == null) {</span>
+<span class="nc" id="L52">            profile = UserProfile.builder().user(user).build();</span>
+<span class="nc" id="L53">            user.setUserProfile(profile);</span>
+        }
+
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (dto.getBio() != null) profile.setBio(dto.getBio());</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (dto.getAvatarUrl() != null) profile.setAvatarUrl(dto.getAvatarUrl());</span>
+
+<span class="nc" id="L59">        userProfileRepository.save(profile);</span>
+
+<span class="nc" id="L61">        return getProfile(username);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

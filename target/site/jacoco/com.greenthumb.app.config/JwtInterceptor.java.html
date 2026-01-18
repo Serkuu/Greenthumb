@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtInterceptor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GreenThumb</a> &gt; <a href="index.source.html" class="el_package">com.greenthumb.app.config</a> &gt; <span class="el_source">JwtInterceptor.java</span></div><h1>JwtInterceptor.java</h1><pre class="source lang-java linenums">package com.greenthumb.app.config;
+
+import com.greenthumb.app.service.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+@Component
+<span class="fc" id="L11">@RequiredArgsConstructor</span>
+public class JwtInterceptor implements HandlerInterceptor {
+
+    private final JwtService jwtService;
+    //Walidacja tokena JWT
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //Pomija zapytania OPTIONS bo był błąd więc naszpąciłem
+<span class="fc bfc" id="L19" title="All 2 branches covered.">        if (&quot;OPTIONS&quot;.equalsIgnoreCase(request.getMethod())) {</span>
+<span class="fc" id="L20">            return true;</span>
+        }
+
+<span class="fc" id="L23">        String path = request.getRequestURI();</span>
+<span class="fc bfc" id="L24" title="All 4 branches covered.">        if (path.contains(&quot;/auth/&quot;) || path.contains(&quot;/error&quot;)) {</span>
+<span class="fc" id="L25">            return true;</span>
+        }
+
+<span class="fc" id="L28">        final String authHeader = request.getHeader(&quot;Authorization&quot;);</span>
+
+        //Sprawdza czy nagłówek Authorization istnieje i zaczyna się od Bearer
+<span class="fc bfc" id="L31" title="All 4 branches covered.">        if (authHeader == null || !authHeader.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L32">            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="fc" id="L33">            return false;</span>
+        }
+
+<span class="fc" id="L36">        final String token = authHeader.substring(7);</span>
+        try {
+            //Weryfikacja tokena i wyciągnięcie nazwy użytkownika
+<span class="fc" id="L39">            String username = jwtService.extractUsername(token);</span>
+<span class="pc bpc" id="L40" title="2 of 4 branches missed.">            if (username != null &amp;&amp; jwtService.isTokenValid(token, username)) {</span>
+                //Dodajemy nazwę użytkownika do atrybutów żądania
+<span class="fc" id="L42">                request.setAttribute(&quot;username&quot;, username);</span>
+<span class="fc" id="L43">                return true;</span>
+            }
+<span class="fc" id="L45">        } catch (Exception e) {</span>
+            //Token nieprawidłowy lub wygasł
+<span class="nc" id="L47">        }</span>
+
+<span class="fc" id="L49">        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="fc" id="L50">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

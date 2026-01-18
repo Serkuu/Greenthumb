@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GardenController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GreenThumb</a> &gt; <a href="index.source.html" class="el_package">com.greenthumb.app.controller</a> &gt; <span class="el_source">GardenController.java</span></div><h1>GardenController.java</h1><pre class="source lang-java linenums">package com.greenthumb.app.controller;
+
+import com.greenthumb.app.exception.BusinessException;
+import com.greenthumb.app.model.entity.Garden;
+import com.greenthumb.app.service.GardenService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/gardens&quot;)
+<span class="nc" id="L14">@RequiredArgsConstructor</span>
+public class GardenController {
+
+    private final GardenService gardenService;
+
+    //Tworzenie nowego ogrodu
+    @PostMapping
+    public ResponseEntity&lt;Garden&gt; createGarden(@RequestBody com.greenthumb.app.model.dto.CreateGardenRequest request, @RequestAttribute(&quot;username&quot;) String username) throws BusinessException {
+<span class="nc" id="L22">        System.out.println(&quot;Received create garden request: &quot; + request.getName() + &quot; from user: &quot; + username);</span>
+<span class="nc" id="L23">        return ResponseEntity.ok(gardenService.createGarden(request.getName(), username));</span>
+    }
+
+    //Pobieranie listy ogrodów
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Garden&gt;&gt; getUserGardens(@RequestAttribute(&quot;username&quot;) String username) throws BusinessException {
+<span class="nc" id="L29">        return ResponseEntity.ok(gardenService.getUserGardens(username));</span>
+    }
+
+    //Usuwanie ogrodu
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteGarden(@PathVariable Long id, @RequestAttribute(&quot;username&quot;) String username) throws BusinessException {
+<span class="nc" id="L35">        gardenService.deleteGarden(id, username);</span>
+<span class="nc" id="L36">        return ResponseEntity.noContent().build();</span>
+    }
+
+    //Pobieranie szczegółów ogrodu
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Garden&gt; getGarden(@PathVariable Long id, @RequestAttribute(&quot;username&quot;) String username) throws BusinessException {
+<span class="nc" id="L42">        return ResponseEntity.ok(gardenService.getGardenById(id, username));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

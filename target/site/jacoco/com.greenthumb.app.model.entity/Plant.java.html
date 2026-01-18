@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Plant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">GreenThumb</a> &gt; <a href="index.source.html" class="el_package">com.greenthumb.app.model.entity</a> &gt; <span class="el_source">Plant.java</span></div><h1>Plant.java</h1><pre class="source lang-java linenums">package com.greenthumb.app.model.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = &quot;plants&quot;)
+<span class="nc bnc" id="L14" title="All 94 branches missed.">@Data</span>
+<span class="pc bpc" id="L15" title="1 of 2 branches missed.">@Builder</span>
+<span class="fc" id="L16">@NoArgsConstructor</span>
+<span class="fc" id="L17">@AllArgsConstructor</span>
+public class Plant {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L22">    private Long id; // Unikalny identyfikator rośliny w bazie</span>
+
+    @Column(nullable = false)
+<span class="fc" id="L25">    private Integer trefleId; // ID rośliny w zewnętrznym API (Trefle)</span>
+
+<span class="fc" id="L27">    private String nickname; // Nazwa własna nadana przez użytkownika</span>
+    
+<span class="fc" id="L29">    private String scientificName; // Nazwa naukowa (łacińska)</span>
+<span class="fc" id="L30">    private String family; // Rodzina roślin</span>
+<span class="fc" id="L31">    private String familyCommonName; // Pospolita nazwa rodziny</span>
+<span class="fc" id="L32">    private Integer year; // Rok odkrycia/opisania</span>
+<span class="fc" id="L33">    private Boolean edible; // Czy jadalna</span>
+    
+<span class="fc" id="L35">    private String imageUrl; // URL do zdjęcia rośliny</span>
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;garden_id&quot;, nullable = false)
+<span class="fc" id="L40">    private Garden garden; // Ogród, do którego należy roślina</span>
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = &quot;plant_tags&quot;,
+            joinColumns = @JoinColumn(name = &quot;plant_id&quot;),
+            inverseJoinColumns = @JoinColumn(name = &quot;tag_id&quot;)
+    )
+    @Builder.Default
+<span class="fc" id="L49">    private Set&lt;Tag&gt; tags = new HashSet&lt;&gt;();</span>
+    
+    public void addTag(Tag tag) {
+<span class="nc" id="L52">        this.tags.add(tag);</span>
+<span class="nc" id="L53">        tag.getPlants().add(this);</span>
+<span class="nc" id="L54">    }</span>
+    
+    public void removeTag(Tag tag) {
+<span class="nc" id="L57">        this.tags.remove(tag);</span>
+<span class="nc" id="L58">        tag.getPlants().remove(this);</span>
+<span class="nc" id="L59">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
