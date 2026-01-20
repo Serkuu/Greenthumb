@@ -27,7 +27,6 @@ import templateImg from '../images/template.png';
 
 const PLACEHOLDER_IMG = templateImg;
 
-// Komponent przycisku usuwania z obsługą hover
 const RemoveButton = ({ onClick }) => {
     const [isHovered, setIsHovered] = useState(false);
 
@@ -101,10 +100,10 @@ export default function GardenDetails() {
                 nickname: plant.common_name,
                 imageUrl: plant.bestImageUrl
             });
-            alert('Plant added!');
+            // Notifications removed as per requirement
             fetchGardenDetails();
         } catch (err) {
-            alert('Error adding plant');
+            console.error(err);
         }
     };
 

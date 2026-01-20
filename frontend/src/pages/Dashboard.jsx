@@ -71,7 +71,7 @@ export default function Dashboard() {
             setNewGardenName('');
             fetchGardens();
         } catch (err) {
-            alert('Error in creating a garden');
+            console.error('Error in creating a garden', err);
         }
     };
 
